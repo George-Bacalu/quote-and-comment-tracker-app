@@ -1,10 +1,14 @@
 const FIREBASE_DOMAIN = "https://http-requests-ebdd0-default-rtdb.firebaseio.com";
 
+const responseStatusHandler = async (response, errorMessage) => {
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.message || errorMessage);
+  return data;
+};
+
 export const getAllQuotes = async () => {
   const response = await fetch(`${FIREBASE_DOMAIN}/quotes.json`);
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.message || "Could not fetch quotes.");
-
+  const data = await responseStatusHandler(response, "Could not fetch quotes.");
   const transformedQuotes = [];
   for (const key in data) {
     transformedQuotes.push({ id: key, ...data[key] });
@@ -14,8 +18,7 @@ export const getAllQuotes = async () => {
 
 export const getSingleQuote = async quoteId => {
   const response = await fetch(`${FIREBASE_DOMAIN}/quotes/${quoteId}.json`);
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.message || "Could not fetch quote.");
+  const data = await responseStatusHandler(response, "Could not fetch quote.");
   const loadedQuote = { id: quoteId, ...data };
   return loadedQuote;
 };
@@ -26,8 +29,7 @@ export const addQuote = async quoteData => {
     body: JSON.stringify(quoteData),
     headers: { "Content-Type": "application/json" },
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.message || "Could not create quote.");
+  await responseStatusHandler(response, "Could not create quote.");
   return null;
 };
 
@@ -37,15 +39,13 @@ export const addComment = async requestData => {
     body: JSON.stringify(requestData.commentData),
     headers: { "Content-Type": "application/json" },
   });
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.message || "Could not add comment.");
+  const data = await responseStatusHandler(response, "Could not add comment.");
   return { commentId: data.name };
 };
 
 export const getAllComments = async quoteId => {
   const response = await fetch(`${FIREBASE_DOMAIN}/comments/${quoteId}.json`);
-  const data = await response.json();
-  if (!response.ok) throw new Error(data.message || "Could not get comments.");
+  const data = await responseStatusHandler(response, "Could not get comments.");
   const transformedComments = [];
   for (const key in data) {
     transformedComments.push({ id: key, ...data[key] });

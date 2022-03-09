@@ -1,5 +1,5 @@
-import CommentItem from "./CommentItem";
 import classes from "./CommentsList.module.css";
+import CommentItem from "./CommentItem";
 
 const CommentsList = props => {
   return (

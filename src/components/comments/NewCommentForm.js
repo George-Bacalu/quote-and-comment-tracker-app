@@ -1,13 +1,12 @@
 import { useRef, useEffect } from "react";
+import classes from "./NewCommentForm.module.css";
 import useHttp from "../../hooks/use-http";
 import { addComment } from "../../lib/api";
-import classes from "./NewCommentForm.module.css";
 import LoadingSpinner from "../UI/LoadingSpinner";
 
 const NewCommentForm = props => {
   const { sendRequest, status, error } = useHttp(addComment);
   const commentTextRef = useRef();
-
   const { onAddedComment } = props;
 
   useEffect(() => {
@@ -17,8 +16,7 @@ const NewCommentForm = props => {
   const submitFormHandler = event => {
     event.preventDefault();
     const enteredText = commentTextRef.current.value;
-
-    // optional: Could validate here
+    if(enteredText.trim().length === 0) return;
     sendRequest({ commentData: { text: enteredText }, quoteId: props.quoteId });
     commentTextRef.current.value = "";
   };
@@ -32,7 +30,7 @@ const NewCommentForm = props => {
       )}
       <div className={classes.control} onSubmit={submitFormHandler}>
         <label htmlFor="comment">Your Comment</label>
-        <textarea id="comment" rows="5" ref={commentTextRef}></textarea>
+        <textarea ref={commentTextRef} id="comment" rows="5"></textarea>
       </div>
       <div className={classes.actions}>
         <button className="btn">Add Comment</button>
